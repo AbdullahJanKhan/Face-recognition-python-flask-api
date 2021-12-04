@@ -28,7 +28,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-class getextension(Resource):
+class getextension2(Resource):
     def post(self):
         
         
@@ -72,7 +72,7 @@ class getextension(Resource):
         })
 
         
-api.add_resource(getextension, "/is_sameperson")
+api.add_resource(getextension2, "/is_sameperson")
 
 if __name__ == "__main__":
     app.run(debug=True)

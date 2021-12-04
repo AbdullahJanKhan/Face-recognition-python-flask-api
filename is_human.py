@@ -5,7 +5,7 @@ from flask.globals import request
 import requests
 import requests.models
 
-from flask import Flask, redirect
+from flask import Flask, redirect, jsonify
 from flask_restful import Api, Resource
 # from requests.models import Responsepip
 import os
@@ -15,7 +15,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 path = os.getcwd()
 # file Upload
 UPLOAD_FOLDER = os.path.join(path, 'uploads')
-final=""
+final = ""
 
 if not os.path.isdir(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
@@ -50,12 +50,12 @@ class getextension(Resource):
                 known_image = face_recognition.load_image_file(file)
                 encoding_1 = face_recognition.face_encodings(known_image)[0]
                 return({
-                    "image":"human"
+                    "image": "human"
                 })
             except Exception:
                 return({
-                       "image":"please upload pic of human"
-                })
+                       "image": "please upload pic of human"
+                       })
         else:
             return({
                 "allowedextensionsare": "pdf, png, jpg, jpeg"
