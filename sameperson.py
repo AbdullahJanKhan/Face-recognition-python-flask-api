@@ -9,13 +9,15 @@ from flask import Flask, redirect
 from flask_restful import Api, Resource
 # from requests.models import Responsepip
 import os
+from PIL import Image
+
 app = Flask(__name__)
 api = Api(app)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 path = os.getcwd()
 # file Upload
 UPLOAD_FOLDER = os.path.join(path, 'uploads')
-final=""
+final = ""
 
 if not os.path.isdir(UPLOAD_FOLDER):
     os.mkdir(UPLOAD_FOLDER)
@@ -30,48 +32,48 @@ def allowed_file(filename):
 
 class getextension2(Resource):
     def post(self):
-        
-        
+        print(request.files)
         if 'file' not in request.files:
             return ({
                 "status": False,
                 "fileuploade": False
-
             })
-         
-        i=0
-        final=""
-        encoding_1=0;
-        encoding_2=0;
+        i = 0
+        final = ""
+        encoding_1 = 0
+        encoding_2 = 0
         for file in request.files.getlist('file'):
             if file and allowed_file(file.filename):
-
-                if i==0:
+                file.save(file.filename)
+                if i == 0:
+                    # f = Image.open(file.filename)
                     known_image = face_recognition.load_image_file(file)
-                    encoding_1 = face_recognition.face_encodings(known_image)[0]
-                    i=i+1
+                    encoding_1 = face_recognition.face_encodings(known_image)[
+                        0]
+                    i = i+1
                 else:
-                     u_image = face_recognition.load_image_file(file)
-                     encoding_2 = face_recognition.face_encodings(u_image)[0]
-                     break
-                     
-                    
-
+                    # f = Image.open(file.filename)
+                    u_image = face_recognition.load_image_file(file)
+                    encoding_2 = face_recognition.face_encodings(u_image)[
+                        0]
+                    break
             else:
                 return({
-                        "allowedextensionsare": " png, jpg, jpeg"
+                    "allowedextensionsare": " png, jpg, jpeg"
                 })
-        final=""
+        final = ""
         results = face_recognition.compare_faces([encoding_1], encoding_2)
+        print(results)
         if results[0]:
-            final="matched"
+            final = "matched"
         else:
-            final="Not matched"        
+            final = "Not matched"
+
         return({
-            "output":final
+            "output": final
         })
 
-        
+
 api.add_resource(getextension2, "/is_sameperson")
 
 if __name__ == "__main__":

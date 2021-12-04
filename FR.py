@@ -66,8 +66,8 @@ api.add_resource(isHuman, "/is_human")
 
 class faceRecognition(Resource):
     def post(self):
-        data = json.loads(request.data)
-        if 'file' not in data:
+        # data = json.loads(request.data)
+        if 'file' not in request.files:
             return jsonify({
                 "status": False,
                 "fileuploade": False
@@ -78,16 +78,16 @@ class faceRecognition(Resource):
         final = ""
         encoding_1 = 0
         encoding_2 = 0
-        filesEncoded = data['file']
-        filesDecoded = [base64.b64decode(f) for f in filesEncoded]
+        # filesEncoded = data['file']
+        # filesDecoded = [base64.b64decode(f) for f in filesEncoded]
         j = 0
-        for file in filesDecoded:
-            with open('file'+str(j)+'.jpg', 'wb') as f:
-                f.write(file)
-                j += 1
+        # for file in filesDecoded:
+        #     with open('file'+str(j)+'.jpg', 'wb') as f:
+        #         f.write(file)
+        #         j += 1
         filesDecoded = os.listdir('./')
-        for file in filesDecoded:
-            if file.endswith('.jpg'):
+        for file in request.files.getlist('file'):
+            if file and allowed_file(file.filename):
                 if i == 0:
                     known_image = face_recognition.load_image_file(file)
                     encoding_1 = face_recognition.face_encodings(known_image)[
@@ -98,20 +98,13 @@ class faceRecognition(Resource):
                     encoding_2 = face_recognition.face_encodings(u_image)[0]
                     break
         final = ""
-        results = face_recognition.compare_faces([encoding_1], encoding_2)
-        if results[0]:
-            final = "matched"
-        else:
-            final = "Not matched"
-        for f in filesDecoded:
-            if f.endswith('.jpg'):
-                os.remove('./'+f)
+        results = face_recognition.compare_faces(
+            [encoding_1], encoding_2, tolerance=0.85)
         return jsonify({
-            "output": final
+            "output": str(results[0])
         })
-
 
 api.add_resource(faceRecognition, "/is_sameperson")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80)
+    app.run(debug=True)
