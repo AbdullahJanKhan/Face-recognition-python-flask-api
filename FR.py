@@ -71,38 +71,21 @@ class faceRecognition(Resource):
             return jsonify({
                 "status": False,
                 "fileuploade": False
-
             })
-
-        i = 0
-        final = ""
         encoding_1 = 0
         encoding_2 = 0
-        # filesEncoded = data['file']
-        # filesDecoded = [base64.b64decode(f) for f in filesEncoded]
-        j = 0
-        # for file in filesDecoded:
-        #     with open('file'+str(j)+'.jpg', 'wb') as f:
-        #         f.write(file)
-        #         j += 1
-        filesDecoded = os.listdir('./')
-        for file in request.files.getlist('file'):
-            if file and allowed_file(file.filename):
-                if i == 0:
-                    known_image = face_recognition.load_image_file(file)
-                    encoding_1 = face_recognition.face_encodings(known_image)[
-                        0]
-                    i = i+1
-                else:
-                    u_image = face_recognition.load_image_file(file)
-                    encoding_2 = face_recognition.face_encodings(u_image)[0]
-                    break
-        final = ""
+        file = request.files.request.files.getlist('file1')[0]
+        known_image = face_recognition.load_image_file(file)
+        encoding_1 = face_recognition.face_encodings(known_image)[0]
+        file = request.files.request.files.getlist('file2')[0]
+        u_image = face_recognition.load_image_file(file)
+        encoding_2 = face_recognition.face_encodings(u_image)[0]
         results = face_recognition.compare_faces(
             [encoding_1], encoding_2, tolerance=0.85)
         return jsonify({
             "output": str(results[0])
         })
+
 
 api.add_resource(faceRecognition, "/is_sameperson")
 
